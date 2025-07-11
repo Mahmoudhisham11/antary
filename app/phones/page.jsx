@@ -149,8 +149,8 @@ function Phones() {
         <body onload="setTimeout(() => { window.print(); setTimeout(() => window.close(), 500); }, 300);">
           <div class="label">
             <div><strong>اسم المنتج:</strong> ${product.name}</div>
-            <div><strong>اسم المنتج:</strong> ${product.battery}</div>
-            <div><strong>اسم المنتج:</strong> ${product.storage}</div>
+            <div><strong> B :</strong> ${product.battery}</div>
+            <div><strong> S :</strong> ${product.storage}</div>
             <div><strong>الكود:</strong> ${product.code}</div>
           </div>
         </body>
