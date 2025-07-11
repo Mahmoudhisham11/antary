@@ -273,38 +273,6 @@ function Phones() {
               />
             </div>
             <div className="inputContainer">
-              <label>الشريحة</label>
-              <select
-                value={form.sim}
-                onChange={(e) => setForm({ ...form, sim: e.target.value })}
-              >
-                <option value="">حالة الشريحة</option>
-                <option value="خط">خط</option>
-                <option value="خطين">خطين</option>
-              </select>
-            </div>
-          </div>
-
-               <div className={styles.inputBox}>
-            <div className="inputContainer">
-              <label><MdDriveFileRenameOutline /></label>
-              <input
-                type="text"
-                placeholder="اسم المنتج"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-            </div>
-            <div className="inputContainer">
-              <label><MdDriveFileRenameOutline /></label>
-              <input
-                type="text"
-                placeholder="التاجر"
-                value={form.owner}
-                onChange={(e) => setForm({ ...form, owner: e.target.value })}
-              />
-            </div>
-            <div className="inputContainer">
                 <select>
                   <option value="">حالة الشريحة</option>
                   <option value="خط">خط</option>
