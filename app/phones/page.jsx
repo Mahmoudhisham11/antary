@@ -273,7 +273,10 @@ function Phones() {
               />
             </div>
             <div className="inputContainer">
-                <select>
+                <select
+                      value={form.sim}
+                      onChange={(e) => setForm({ ...form, sim: e.target.value })}
+                >
                   <option value="">حالة الشريحة</option>
                   <option value="خط">خط</option>
                   <option value="خطين">خطين</option>
