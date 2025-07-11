@@ -18,6 +18,8 @@ function Debts() {
         phone: "",
         debt: "",
         debtType: "",
+        debtDirection: "",
+        dateInput: ""
     });
     const [customers, setCustomers] = useState([]);
 
@@ -37,7 +39,7 @@ function Debts() {
     }, [shop]);
 
     const handleAddProduct = async () => {
-        if (!form.name || !form.phone || !form.debt || !form.debtType) {
+        if (!form.name || !form.phone || !form.debt || !form.debtType || !form.debtDirection || !form.dateInput) {
             alert("يرجى ملء كل الحقول");
             return;
         }
@@ -47,11 +49,13 @@ function Debts() {
             phone: form.phone,
             debt: Number(form.debt),
             debtType: form.debtType,
+            debtDirection: form.debtDirection,
+            dateInput: form.dateInput,
             date: new Date(),
             shop: shop,
         });
 
-        setForm({ name: "", phone: "", debt: "", debtType: "" });
+        setForm({ name: "", phone: "", debt: "", debtType: "", debtDirection: "", dateInput: "" });
         setActive(false);
     };
 
@@ -98,7 +102,9 @@ function Debts() {
                                     <th>رقم الهاتف</th>
                                     <th>الدين</th>
                                     <th>نوع الدين</th>
-                                    <th>التاريخ</th>
+                                    <th>الدين لمين</th>
+                                    <th>تاريخ الدين</th>
+                                    <th>تاريخ الإضافة</th>
                                     <th>حذف</th>
                                 </tr>
                             </thead>
@@ -109,6 +115,8 @@ function Debts() {
                                         <td>{customer.phone}</td>
                                         <td>{customer.debt} EGP</td>
                                         <td>{customer.debtType}</td>
+                                        <td>{customer.debtDirection}</td>
+                                        <td>{customer.dateInput}</td>
                                         <td>{customer.date?.toDate().toLocaleDateString("ar-EG")}</td>
                                         <td>
                                             <button className={styles.delBtn} onClick={() => handleDelete(customer.id)}>
@@ -164,6 +172,26 @@ function Debts() {
                                 <option value="موبايل">موبايل</option>
                                 <option value="اكسسوار">اكسسوار</option>
                                 <option value="صيانة">صيانة</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className={styles.inputBox}>
+                        <div className="inputContainer">
+                            <input
+                                type="date"
+                                value={form.dateInput}
+                                onChange={(e) => setForm({ ...form, dateInput: e.target.value })}
+                            />
+                        </div>
+                        <div className="inputContainer">
+                            <label><GiMoneyStack /></label>
+                            <select
+                                value={form.debtDirection}
+                                onChange={(e) => setForm({ ...form, debtDirection: e.target.value })}
+                            >
+                                <option value="">الدين لمين</option>
+                                <option value="ليك">ليك</option>
+                                <option value="عليك">عليك</option>
                             </select>
                         </div>
                     </div>

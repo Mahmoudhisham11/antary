@@ -34,7 +34,8 @@ function Phones() {
     tax: 'يوجد',
     box: 'يوجد',
     condition: 'جديد',
-    owner: ''
+    owner: '',
+    sim: '' // ✅ حقل الشريحة
   });
 
   const [products, setProducts] = useState([]);
@@ -70,7 +71,7 @@ function Phones() {
 
   const handleAddProduct = async () => {
     try {
-      if (!form.name || !form.buyPrice || !form.sellPrice || !form.battery || !form.storage || !form.color || !form.serial || !form.owner) {
+      if (!form.name || !form.buyPrice || !form.sellPrice || !form.battery || !form.storage || !form.color || !form.serial || !form.owner || !form.sim) {
         alert("❗️يرجى ملء جميع الحقول المطلوبة");
         return;
       }
@@ -88,6 +89,7 @@ function Phones() {
         box: form.box,
         condition: form.condition,
         owner: form.owner,
+        sim: form.sim, // ✅ إضافة إلى قاعدة البيانات
         date: Timestamp.now(),
         type: "phone",
         shop: shop,
@@ -105,7 +107,8 @@ function Phones() {
         tax: 'يوجد',
         box: 'يوجد',
         condition: 'جديد',
-        owner: ''
+        owner: '',
+        sim: '' // ✅ تصفير الحقل
       });
     } catch (error) {
       console.error("❌ خطأ أثناء الإضافة:", error);
@@ -191,7 +194,6 @@ function Phones() {
             </div>
           </div>
 
-          {/* ✅ عرض اجمالي الشراء و البيع */}
           <div className={styles.totals}>
             <p>اجمالي الشراء: {totalBuy} EGP</p>
             <p>اجمالي البيع: {totalSell} EGP</p>
@@ -212,6 +214,7 @@ function Phones() {
                   <th>الضريبة</th>
                   <th>الكرتونة</th>
                   <th>الحالة</th>
+                  <th>الشريحة</th>
                   <th>التاجر</th>
                   <th>التاريخ</th>
                   <th>تفاعل</th>
@@ -231,6 +234,7 @@ function Phones() {
                     <td>{product.tax}</td>
                     <td>{product.box}</td>
                     <td>{product.condition}</td>
+                    <td>{product.sim}</td>
                     <td>{product.owner}</td>
                     <td>{product.date?.toDate().toLocaleDateString("ar-EG")}</td>
                     <td className={styles.actionBtns}>
@@ -248,9 +252,8 @@ function Phones() {
           </div>
         </div>
 
-        {/* ✅ نموذج الإضافة بدون تعديل */}
         <div className={styles.addContainer} style={{ display: active ? 'flex' : 'none' }}>
-            <div className={styles.inputBox}>
+          <div className={styles.inputBox}>
             <div className="inputContainer">
               <label><MdDriveFileRenameOutline /></label>
               <input
@@ -268,6 +271,45 @@ function Phones() {
                 value={form.owner}
                 onChange={(e) => setForm({ ...form, owner: e.target.value })}
               />
+            </div>
+            <div className="inputContainer">
+              <label>الشريحة</label>
+              <select
+                value={form.sim}
+                onChange={(e) => setForm({ ...form, sim: e.target.value })}
+              >
+                <option value="">حالة الشريحة</option>
+                <option value="خط">خط</option>
+                <option value="خطين">خطين</option>
+              </select>
+            </div>
+          </div>
+
+               <div className={styles.inputBox}>
+            <div className="inputContainer">
+              <label><MdDriveFileRenameOutline /></label>
+              <input
+                type="text"
+                placeholder="اسم المنتج"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label><MdDriveFileRenameOutline /></label>
+              <input
+                type="text"
+                placeholder="التاجر"
+                value={form.owner}
+                onChange={(e) => setForm({ ...form, owner: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+                <select>
+                  <option value="">حالة الشريحة</option>
+                  <option value="خط">خط</option>
+                  <option value="خطين">خطين</option>
+                </select>
             </div>
           </div>
 
@@ -368,8 +410,9 @@ function Phones() {
             اضف المنتج
           </button>
         </div>
+
+        </div>
       </div>
-    </div>
   );
 }
 
