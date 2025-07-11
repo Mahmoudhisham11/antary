@@ -5,6 +5,43 @@
     justify-content: start;
     align-items: start;
 }
+.boxContainer {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column  ;
+    z-index: 1;
+}
+.boxTitle {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 2%;
+}
+.boxTitle button {
+    position: fixed;
+    top: 30px;
+    left: 20px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+}
+.boxContent {
+    width: 100%;
+    padding: 0 2%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
 .content {
     width: 100%;
 }

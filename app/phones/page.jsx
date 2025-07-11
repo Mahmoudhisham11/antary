@@ -7,6 +7,8 @@ import { MdDriveFileRenameOutline } from "react-icons/md";
 import { GiMoneyStack } from "react-icons/gi";
 import { CiSearch } from "react-icons/ci";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { CiEdit } from "react-icons/ci";
+import { IoIosCloseCircle } from "react-icons/io";
 
 import {
   collection,
@@ -17,11 +19,14 @@ import {
   Timestamp,
   deleteDoc,
   doc,
-  getDocs
+  getDocs,
+  updateDoc 
 } from "firebase/firestore";
 import { db } from "../firebase";
 
 function Phones() {
+  const [editId, setEditId] = useState(null);
+  const [openEdit, setOpenEdit] = useState(false)
   const [active, setActive] = useState(false);
   const [form, setForm] = useState({
     name: '',
@@ -163,12 +168,210 @@ function Phones() {
     printWindow.document.close();
   };
 
+  const handleEdit = (product) => {
+    setOpenEdit(true);
+    setEditId(product.id); // نحدد المنتج اللي بنعدله
+    setForm({
+      name: product.name || '',
+      buyPrice: product.buyPrice || '',
+      sellPrice: product.sellPrice || '',
+      battery: product.battery || '',
+      storage: product.storage || '',
+      color: product.color || '',
+      serial: product.serial || '',
+      tax: product.tax || 'يوجد',
+      box: product.box || 'يوجد',
+      condition: product.condition || 'جديد',
+      owner: product.owner || '',
+      sim: product.sim || ''
+    });
+  };
+
+  const handleUpdateProduct = async () => {
+  if (!editId) return alert("❗ لا يوجد منتج محدد للتعديل");
+  setOpenEdit(true)
+  try {
+    await updateDoc(doc(db, "products", editId), {
+      name: form.name,
+      buyPrice: Number(form.buyPrice),
+      sellPrice: Number(form.sellPrice),
+      battery: form.battery,
+      storage: form.storage,
+      color: form.color,
+      serial: form.serial,
+      tax: form.tax,
+      box: form.box,
+      condition: form.condition,
+      owner: form.owner,
+      sim: form.sim
+    });
+    alert("✅ تم تعديل المنتج بنجاح");
+    setForm({
+      name: '',
+      buyPrice: '',
+      sellPrice: '',
+      battery: '',
+      storage: '',
+      color: '',
+      serial: '',
+      tax: 'يوجد',
+      box: 'يوجد',
+      condition: 'جديد',
+      owner: '',
+      sim: ''
+    });
+    setOpenEdit(false);
+    setEditId(null);
+  } catch (error) {
+    console.error("❌ خطأ أثناء التعديل:", error);
+    alert("حدث خطأ أثناء التعديل");
+  }
+};
+
+
+
+
   const totalBuy = filteredProducts.reduce((acc, product) => acc + Number(product.buyPrice || 0), 0);
   const totalSell = filteredProducts.reduce((acc, product) => acc + Number(product.sellPrice || 0), 0);
 
   return (
     <div className={styles.phones}>
       <SideBar />
+      <div className={styles.boxContainer} style={{display: openEdit ? 'flex' : 'none'}}>
+        <div className={styles.boxTitle}>
+          <h2>تعديل منتج</h2>
+          <button onClick={() => setOpenEdit(false)}><IoIosCloseCircle/></button>
+        </div>
+        <div className={styles.boxContent}>
+          <div className={styles.inputBox}>
+            <div className="inputContainer">
+              <label><MdDriveFileRenameOutline /></label>
+              <input
+                type="text"
+                placeholder="اسم المنتج"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label><MdDriveFileRenameOutline /></label>
+              <input
+                type="text"
+                placeholder="التاجر"
+                value={form.owner}
+                onChange={(e) => setForm({ ...form, owner: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+                <select
+                      value={form.sim}
+                      onChange={(e) => setForm({ ...form, sim: e.target.value })}
+                >
+                  <option value="">حالة الشريحة</option>
+                  <option value="خط">خط</option>
+                  <option value="خطين">خطين</option>
+                </select>
+            </div>
+          </div>
+
+          <div className={styles.inputBox}>
+            <div className="inputContainer">
+              <label><GiMoneyStack /></label>
+              <input
+                type="number"
+                placeholder="سعر الشراء"
+                value={form.buyPrice}
+                onChange={(e) => setForm({ ...form, buyPrice: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label><GiMoneyStack /></label>
+              <input
+                type="number"
+                placeholder="سعر البيع"
+                value={form.sellPrice}
+                onChange={(e) => setForm({ ...form, sellPrice: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label>السريال</label>
+              <input
+                type="text"
+                placeholder="السريال"
+                value={form.serial}
+                onChange={(e) => setForm({ ...form, serial: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className={styles.inputBox}>
+            <div className="inputContainer">
+              <label>البطارية</label>
+              <input
+                type="text"
+                placeholder="البطارية"
+                value={form.battery}
+                onChange={(e) => setForm({ ...form, battery: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label>المساحة</label>
+              <input
+                type="text"
+                placeholder="المساحة"
+                value={form.storage}
+                onChange={(e) => setForm({ ...form, storage: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label>اللون</label>
+              <input
+                type="text"
+                placeholder="اللون"
+                value={form.color}
+                onChange={(e) => setForm({ ...form, color: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className={styles.inputBox}>
+            <div className="inputContainer">
+              <label>الضريبة</label>
+              <select
+                value={form.tax}
+                onChange={(e) => setForm({ ...form, tax: e.target.value })}
+              >
+                <option value="معفي">معفي</option>
+                <option value="بضريبة">بضريبة</option>
+              </select>
+            </div>
+            <div className="inputContainer">
+              <label>الكرتونة</label>
+              <select
+                value={form.box}
+                onChange={(e) => setForm({ ...form, box: e.target.value })}
+              >
+                <option value="يوجد">يوجد</option>
+                <option value="لا يوجد">لا يوجد</option>
+              </select>
+            </div>
+            <div className="inputContainer">
+              <label>الحالة</label>
+              <select
+                value={form.condition}
+                onChange={(e) => setForm({ ...form, condition: e.target.value })}
+              >
+                <option value="جديد">جديد</option>
+                <option value="مستعمل">مستعمل</option>
+              </select>
+            </div>
+          </div>
+
+          <button className={styles.addBtn} onClick={handleUpdateProduct}>
+            تعديل المنتج
+          </button>
+        </div>
+      </div>
       <div className={styles.content}>
         <div className={styles.btns}>
           <button onClick={() => setActive(false)}>كل الموبايلات</button>
@@ -243,6 +446,9 @@ function Phones() {
                       </button>
                       <button onClick={() => handlePrintLabel(product)} className={styles.print}>
                         🖨️
+                      </button>
+                      <button onClick={() => handleEdit(product)} className={styles.print}>
+                        <CiEdit/>
                       </button>
                     </td>
                   </tr>
