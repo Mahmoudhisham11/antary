@@ -34,6 +34,7 @@ function Phones() {
     tax: 'يوجد',
     box: 'يوجد',
     condition: 'جديد',
+    owner: ''
   });
 
   const [products, setProducts] = useState([]);
@@ -42,10 +43,8 @@ function Phones() {
 
   useEffect(() => {
     if (!shop) return;
-
     const productsRef = collection(db, "products");
     const q = query(productsRef, where("shop", "==", shop), where('type', '==', 'phone'));
-
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
@@ -53,7 +52,6 @@ function Phones() {
       }));
       setProducts(data);
     });
-
     return () => unsubscribe();
   }, [shop]);
 
@@ -72,13 +70,11 @@ function Phones() {
 
   const handleAddProduct = async () => {
     try {
-      if (!form.name || !form.buyPrice || !form.sellPrice || !form.battery || !form.storage || !form.color || !form.serial) {
+      if (!form.name || !form.buyPrice || !form.sellPrice || !form.battery || !form.storage || !form.color || !form.serial || !form.owner) {
         alert("❗️يرجى ملء جميع الحقول المطلوبة");
         return;
       }
-
       const newCode = await getNextCode();
-
       await addDoc(collection(db, "products"), {
         code: newCode,
         name: form.name,
@@ -91,14 +87,13 @@ function Phones() {
         tax: form.tax,
         box: form.box,
         condition: form.condition,
+        owner: form.owner,
         date: Timestamp.now(),
         type: "phone",
         shop: shop,
         userEmail: localStorage.getItem("email"),
       });
-
       alert("✅ تم إضافة المنتج بنجاح");
-
       setForm({
         name: '',
         buyPrice: '',
@@ -110,8 +105,8 @@ function Phones() {
         tax: 'يوجد',
         box: 'يوجد',
         condition: 'جديد',
+        owner: ''
       });
-
     } catch (error) {
       console.error("❌ خطأ أثناء الإضافة:", error);
       alert("حدث خطأ أثناء الإضافة");
@@ -163,6 +158,9 @@ function Phones() {
     printWindow.document.close();
   };
 
+  const totalBuy = filteredProducts.reduce((acc, product) => acc + Number(product.buyPrice || 0), 0);
+  const totalSell = filteredProducts.reduce((acc, product) => acc + Number(product.sellPrice || 0), 0);
+
   return (
     <div className={styles.phones}>
       <SideBar />
@@ -190,13 +188,20 @@ function Phones() {
               </datalist>
             </div>
           </div>
+
+          {/* ✅ عرض اجمالي الشراء و البيع */}
+          <div className={styles.totals}>
+            <p>اجمالي الشراء: {totalBuy} EGP</p>
+            <p>اجمالي البيع: {totalSell} EGP</p>
+          </div>
+
           <div className={styles.tableContainer}>
             <table>
               <thead>
                 <tr>
                   <th>الكود</th>
                   <th>الاسم</th>
-                  <th> الشراء</th>
+                  <th>الشراء</th>
                   <th>البيع</th>
                   <th>البطارية</th>
                   <th>المساحة</th>
@@ -205,6 +210,7 @@ function Phones() {
                   <th>الضريبة</th>
                   <th>الكرتونة</th>
                   <th>الحالة</th>
+                  <th>التاجر</th>
                   <th>التاريخ</th>
                   <th>تفاعل</th>
                 </tr>
@@ -223,6 +229,7 @@ function Phones() {
                     <td>{product.tax}</td>
                     <td>{product.box}</td>
                     <td>{product.condition}</td>
+                    <td>{product.owner}</td>
                     <td>{product.date?.toDate().toLocaleDateString("ar-EG")}</td>
                     <td className={styles.actionBtns}>
                       <button className={styles.delBtn} onClick={() => handleDelete(product.id)}>
@@ -239,8 +246,9 @@ function Phones() {
           </div>
         </div>
 
+        {/* ✅ نموذج الإضافة بدون تعديل */}
         <div className={styles.addContainer} style={{ display: active ? 'flex' : 'none' }}>
-          <div className={styles.inputBox}>
+            <div className={styles.inputBox}>
             <div className="inputContainer">
               <label><MdDriveFileRenameOutline /></label>
               <input
@@ -248,6 +256,15 @@ function Phones() {
                 placeholder="اسم المنتج"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div className="inputContainer">
+              <label><MdDriveFileRenameOutline /></label>
+              <input
+                type="text"
+                placeholder="التاجر"
+                value={form.owner}
+                onChange={(e) => setForm({ ...form, owner: e.target.value })}
               />
             </div>
           </div>
