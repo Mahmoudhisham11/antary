@@ -189,6 +189,7 @@ function Main() {
                         <th>كود المنتج</th>
                         <th>اسم المنتج</th>
                         <th>السعر</th>
+                        <th>السريال</th>
                         <th>السعر النهائي</th>
                         <th>تفاعل</th>
                     </tr>
@@ -199,6 +200,7 @@ function Main() {
                         <td>{product.code}</td>
                         <td>{product.name}</td>
                         <td>{product.sellPrice} EGP</td>
+                        <td>{product.serial}</td>
                         <td>
                           <input
                           type="number"
