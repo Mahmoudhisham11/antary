@@ -13,6 +13,7 @@ import { db } from "@/app/firebase";
 function Main() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const [customPrices, setCustomPrices] = useState({});
   const [searchCode, setSearchCode] = useState("");
   const [filterType, setFilterType] = useState("all");
   const shop = typeof window !== "undefined" ? localStorage.getItem("shop") : "";
@@ -38,15 +39,26 @@ function Main() {
   }, [shop]);
 
   const handleAddToCart = async (product) => {
+    const customPrice = Number(customPrices[product.id]);
+    const finalPrice = !isNaN(customPrice) && customPrice > 0 ? customPrice : product.sellPrice;
+
     await addDoc(collection(db, "cart"), {
       name: product.name,
-      sellPrice: product.sellPrice,
+      sellPrice: finalPrice,
       quantity: 1,
-      total: product.sellPrice,
+      total: finalPrice,
       date: new Date(),
       shop: shop,
     });
+
+    // اختيارية: امسح السعر من الـ input بعد الإضافة
+    setCustomPrices(prev => {
+      const updated = { ...prev };
+      delete updated[product.id];
+      return updated;
+    });
   };
+
 
   const handleQtyChange = async (cartItem, delta) => {
     const newQty = cartItem.quantity + delta;
@@ -177,6 +189,7 @@ function Main() {
                         <th>كود المنتج</th>
                         <th>اسم المنتج</th>
                         <th>السعر</th>
+                        <th>السعر النهائي</th>
                         <th>تفاعل</th>
                     </tr>
                 </thead>
@@ -186,6 +199,16 @@ function Main() {
                         <td>{product.code}</td>
                         <td>{product.name}</td>
                         <td>{product.sellPrice} EGP</td>
+                        <td>
+                          <input
+                          type="number"
+                          placeholder="سعر مخصص"
+                          value={customPrices[product.id] || ""}
+                          onChange={(e) =>
+                            setCustomPrices({ ...customPrices, [product.id]: e.target.value })
+                          }
+                        />
+                        </td>
                         <td className="actions">
                             <button onClick={() => handleAddToCart(product)}>
                             <CiShoppingCart />

@@ -36,7 +36,7 @@ function Phones() {
     storage: '',
     color: '',
     serial: '',
-    tax: 'يوجد',
+    tax: 'معفي',
     box: 'يوجد',
     condition: 'جديد',
     owner: '',
