@@ -1,11 +1,14 @@
 'use client';
 import SideBar from "../SideBar/page";
 import styles from "./styles.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IoMdSearch } from "react-icons/io";
 import { CiShoppingCart } from "react-icons/ci";
 import { FaRegTrashAlt } from "react-icons/fa";
-import {  
+import { IoIosCloseCircle } from "react-icons/io";
+import { FaUser } from "react-icons/fa";
+import { FaPhone } from "react-icons/fa";
+import {   
   collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDocs 
 } from "firebase/firestore";
 import { db } from "@/app/firebase";
@@ -13,9 +16,12 @@ import { db } from "@/app/firebase";
 function Main() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+  const [savePage, setSavePage] = useState(false)
   const [customPrices, setCustomPrices] = useState({});
   const [searchCode, setSearchCode] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const nameRef = useRef();
+  const phoneRef = useRef();
   const shop = typeof window !== "undefined" ? localStorage.getItem("shop") : "";
 
   useEffect(() => {
@@ -45,20 +51,19 @@ function Main() {
     await addDoc(collection(db, "cart"), {
       name: product.name,
       sellPrice: finalPrice,
+      serial: product.serial || 0,
       quantity: 1,
       total: finalPrice,
       date: new Date(),
       shop: shop,
     });
 
-    // اختيارية: امسح السعر من الـ input بعد الإضافة
     setCustomPrices(prev => {
       const updated = { ...prev };
       delete updated[product.id];
       return updated;
     });
   };
-
 
   const handleQtyChange = async (cartItem, delta) => {
     const newQty = cartItem.quantity + delta;
@@ -76,7 +81,6 @@ function Main() {
 
   const totalAmount = cart.reduce((acc, item) => acc + item.total, 0);
 
-  // ⬇️ فلترة حسب نوع المنتج أو االاسم
   const filteredProducts = products.filter((p) => {
     const matchCode = searchCode.trim() === "" || p.name === searchCode.trim();
     const matchType =
@@ -91,38 +95,67 @@ function Main() {
   const phonesCount = products.filter(p => p.type === "phone").length;
   const otherCount = products.filter(p => p.type !== "phone").length;
 
-  // ✅ زر حفظ الفاتورة
-  const handleSaveInvoice = async () => {
-    if (cart.length === 0) {
-      alert("السلة فارغة، لا يمكن حفظ الفاتورة.");
-      return;
-    }
+  const handleSaveReport = async () => {
+    const name = nameRef.current.value.trim();
+    const phone = phoneRef.current.value.trim();
+    if (!name || !phone || cart.length === 0) return alert("ادخل اسم العميل ورقم الهاتف واضف منتجات أولاً");
 
-    const report = {
-      items: cart,
-      total: totalAmount,
+    await addDoc(collection(db, "users"), {
+      name,
+      phone,
       date: new Date(),
-      shop: shop,
-    };
+      shop,
+    });
 
-    try {
-      await addDoc(collection(db, "reports"), report);
-      alert("تم حفظ الفاتورة بنجاح!");
+    await addDoc(collection(db, "reports"), {
+      name,
+      phone,
+      date: new Date(),
+      cart,
+      total: totalAmount,
+      shop,
+    });
 
-      // 🧹 اختيارية: حذف العناصر من cart بعد الحفظ
-      for (const item of cart) {
-        await deleteDoc(doc(db, "cart", item.id));
+    for (const item of cart) {
+      const productDoc = products.find(p => p.name === item.name);
+      if (!productDoc) continue;
+
+      if (productDoc.quantity && productDoc.quantity > item.quantity) {
+        await updateDoc(doc(db, "products", productDoc.id), {
+          quantity: productDoc.quantity - item.quantity,
+        });
+      } else {
+        await deleteDoc(doc(db, "products", productDoc.id));
       }
-
-    } catch (error) {
-      console.error("فشل حفظ الفاتورة:", error);
-      alert("حدث خطأ أثناء الحفظ.");
     }
-  };
+
+    const cartDocs = await getDocs(query(collection(db, "cart"), where("shop", "==", shop)));
+    cartDocs.forEach(async (c) => await deleteDoc(doc(db, "cart", c.id)));
+
+    setSavePage(false);
+  }
 
   return (
     <div className={styles.mainContainer}>
       <SideBar />
+      <div className={styles.boxContainer} style={{display: savePage ? 'block' : 'none'}}>
+        <div className={styles.boxTitle}>
+          <h2>تقفيل البيعة</h2>
+          <button onClick={() => setSavePage(false)}><IoIosCloseCircle/></button>
+        </div>
+        <div className={styles.boxContent}>
+          <div className="inputContainer">
+            <label htmlFor=""><FaUser/></label>
+            <input ref={nameRef} type="text" placeholder="اسم العميل"/>
+          </div>
+          <div className="inputContainer">
+            <label htmlFor=""><FaPhone/></label>
+            <input ref={phoneRef} type="text" placeholder="رقم الهاتف"/>
+          </div>
+          <button onClick={handleSaveReport}>تقفيل البيعة</button>
+        </div>
+      </div>
+
       <div className={styles.middleSection}>
         <div className={styles.title}>
           <h3>المبيعات</h3>
@@ -138,7 +171,6 @@ function Main() {
             </div>
           </div>
         </div>
-
         {/* ✅ تصنيفات المنتج */}
         <div className={styles.categoryContainer}>
           <div
@@ -221,8 +253,8 @@ function Main() {
                 </tbody>
           </table>
         </div>
-      </div>
-      {/* ✅ الفاتورة */}
+    </div>
+     {/* ✅ الفاتورة */}
       <div className={styles.resetContainer}>
         <div className={styles.reset}>
           <div className={styles.resetTitle}>
@@ -258,11 +290,12 @@ function Main() {
               <strong>{totalAmount} EGP</strong>
             </div>
             <div className={styles.resetBtns}>
-              <button onClick={handleSaveInvoice}>حفظ</button>
+              <button onClick={() => setSavePage(true)}>حفظ</button>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

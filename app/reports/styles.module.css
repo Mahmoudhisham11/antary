@@ -1,0 +1,14 @@
+.reports {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: start;
+    align-items: start;
+}
+.content {
+    width: 100%;
+    padding: 30px 2%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

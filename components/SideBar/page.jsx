@@ -48,7 +48,7 @@ function SideBar() {
                     <span><TbReportMoney/></span>
                     <span>الديون</span>
                 </Link>
-                <Link href={'/'} className={styles.actionLinks}>
+                <Link href={'/reports'} className={styles.actionLinks}>
                     <span><TbReportSearch/></span>
                     <span>التقارير</span>
                 </Link>
