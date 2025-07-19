@@ -129,24 +129,26 @@ function Debts() {
                             </tbody>
                         </table>
                     </div>
-                    {customers.map((customer, index) => (
-                        <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={customer.id}>
-                            <div className="cardHead">
-                            <h3>{customer.name}</h3>
-                            <div className="btns">
-                               <button className={styles.delBtn} onClick={() => handleDelete(customer.id)}><FaRegTrashAlt /></button>
+                    <div className="mobilContainer">
+                        {customers.map((customer, index) => (
+                            <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={customer.id}>
+                                <div className="cardHead">
+                                <h3>{customer.name}</h3>
+                                <div className="btns">
+                                <button className={styles.delBtn} onClick={() => handleDelete(customer.id)}><FaRegTrashAlt /></button>
+                                </div>
+                                </div>
+                                <hr />
+                                <div className="cardBody">
+                                <strong>رقم الهاتف: {customer.phone} </strong>
+                                <strong>الدين: {customer.debt} EGP</strong>
+                                <strong>نوع الدين: {customer.debtType}</strong>
+                                <strong>تاريخ الدين: {customer.dateInput}</strong>
+                                <strong>تاريخ الاضافة: {customer.date?.toDate().toLocaleDateString("ar-EG")}</strong>
+                                </div>
                             </div>
-                            </div>
-                            <hr />
-                            <div className="cardBody">
-                            <strong>رقم الهاتف: {customer.phone} </strong>
-                            <strong>الدين: {customer.debt} EGP</strong>
-                            <strong>نوع الدين: {customer.debtType}</strong>
-                            <strong>تاريخ الدين: {customer.dateInput}</strong>
-                            <strong>تاريخ الاضافة: {customer.date?.toDate().toLocaleDateString("ar-EG")}</strong>
-                            </div>
-                        </div>
-                        ))}
+                            ))}
+                    </div>
                 </div>
                 {/* ✅ إضافة عميل */}
                 <div className={styles.addContainer} style={{ display: active ? 'flex' : 'none' }}>

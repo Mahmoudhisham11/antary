@@ -220,26 +220,28 @@ function Products() {
               </tbody>
             </table>
           </div>
-          {filteredProducts.map((product, index) => (
-            <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={product.id}>
-              <div className="cardHead">
-                <h3>{product.name}</h3>
-                <div className="btns">
-                  <button onClick={() => handlePrintLabel(product)} className={styles.print}>🖨️</button>
-                  <button className={styles.delBtn} onClick={() => handleDelete(product.id)}><FaRegTrashAlt /></button>
+          <div className="mobileContainer">
+            {filteredProducts.map((product, index) => (
+              <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={product.id}>
+                <div className="cardHead">
+                  <h3>{product.name}</h3>
+                  <div className="btns">
+                    <button onClick={() => handlePrintLabel(product)} className={styles.print}>🖨️</button>
+                    <button className={styles.delBtn} onClick={() => handleDelete(product.id)}><FaRegTrashAlt /></button>
+                  </div>
+                </div>
+                <hr />
+                <div className="cardBody">
+                  <strong>كود المنتج: {product.code}</strong>
+                  <strong>سعر الشراء: {product.buyPrice} EGP</strong>
+                  <strong>سعر البيع: {product.sellPrice} EGP</strong>
+                  <strong>الكمية: {product.quantity}</strong>
+                  <strong>المورد: {product.owner}</strong>
+                  <strong>التاريخ: {product.date?.toDate().toLocaleDateString("ar-EG")}</strong>
                 </div>
               </div>
-              <hr />
-              <div className="cardBody">
-                <strong>كود المنتج: {product.code}</strong>
-                <strong>سعر الشراء: {product.buyPrice} EGP</strong>
-                <strong>سعر البيع: {product.sellPrice} EGP</strong>
-                <strong>الكمية: {product.quantity}</strong>
-                <strong>المورد: {product.owner}</strong>
-                <strong>التاريخ: {product.date?.toDate().toLocaleDateString("ar-EG")}</strong>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* إضافة منتج جديد */}

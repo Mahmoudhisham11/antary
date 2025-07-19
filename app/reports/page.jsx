@@ -93,7 +93,8 @@ function Reports() {
                 </div>
 
                 {/* الكروت بتفاصيل المنتجات داخل الـ cart */}
-                {reports.map((report, reportIndex) =>
+                <div className="moblieContainer">
+                                    {reports.map((report, reportIndex) =>
                     report.cart?.map((item, index) => {
                         const cardIndex = `${reportIndex}-${index}`;
                         return (
@@ -127,6 +128,7 @@ function Reports() {
                         );
                     })
                 )}
+                </div>
             </div>
         </div>
     );
