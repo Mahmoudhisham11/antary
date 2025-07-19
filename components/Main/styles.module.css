@@ -19,6 +19,18 @@
 .title h3 {
     font-size: 30px;
 }
+.rightSide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.rightSide button {
+    background-color: transparent;
+    border: none;
+    color: black;
+    font-size: 20px;
+}
 .inputBox {
     width: 40%;
 }
@@ -215,4 +227,16 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
+}
+
+@media(max-width: 767px) {
+    .resetContainer {
+        display: none;
+    }
+    .middleSection {
+        width: 100%;
+    }
+    .lastRow {
+        display: none;
+    }
 }

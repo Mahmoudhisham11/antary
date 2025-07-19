@@ -28,6 +28,7 @@ function Phones() {
   const [editId, setEditId] = useState(null);
   const [openEdit, setOpenEdit] = useState(false)
   const [active, setActive] = useState(false);
+  const [openCard, setOpenCard] = useState('')
   const [form, setForm] = useState({
     name: '',
     buyPrice: '',
@@ -377,7 +378,6 @@ function Phones() {
           <button onClick={() => setActive(false)}>كل الموبايلات</button>
           <button onClick={() => setActive(true)}>اضف موبايل جديد</button>
         </div>
-
         <div className={styles.phoneContainer} style={{ display: active ? 'none' : 'flex' }}>
           <div className={styles.searchBox}>
             <div className="inputContainer">
@@ -396,12 +396,10 @@ function Phones() {
               </datalist>
             </div>
           </div>
-
           <div className={styles.totals}>
             <p>اجمالي الشراء: {totalBuy} EGP</p>
             <p>اجمالي البيع: {totalSell} EGP</p>
           </div>
-
           <div className={styles.tableContainer}>
             <table>
               <thead>
@@ -455,6 +453,36 @@ function Phones() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className={styles.moblieCardContainer}>
+            {filteredProducts.map((product, index) => (
+              <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={product.id}>
+                <div className="cardHead">
+                  <h3>{product.name}</h3>
+                  <div className="btns">
+                    <button onClick={() => handleEdit(product)} className={styles.print}><CiEdit/></button>
+                    <button onClick={() => handlePrintLabel(product)} className={styles.print}>🖨️</button>
+                    <button className={styles.delBtn} onClick={() => handleDelete(product.id)}><FaRegTrashAlt /></button>
+                  </div>
+                </div>
+                <hr />
+                <div className="cardBody">
+                  <strong>كود المنتج: {product.code}</strong>
+                  <strong>سعر الشراء: {product.buyPrice} EGP</strong>
+                  <strong>سعر البيع: {product.sellPrice} EGP</strong>
+                  <strong>البطارية: {product.battery}</strong>
+                  <strong>المساحة: {product.storage}</strong>
+                  <strong>اللون: {product.color}</strong>
+                  <strong>السريال: {product.serial}</strong>
+                  <strong>الضريبة: {product.tax}</strong>
+                  <strong>الكرتونة: {product.box}</strong>
+                  <strong>الحالة: {product.condition}</strong>
+                  <strong>الشريحة: {product.sim}</strong>
+                  <strong>التاجر: {product.owner}</strong>
+                  <strong></strong>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

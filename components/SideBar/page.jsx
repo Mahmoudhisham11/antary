@@ -11,8 +11,9 @@ import { GoGear } from "react-icons/go";
 import { BiLogOutCircle } from "react-icons/bi";
 import { TbReportSearch } from "react-icons/tb";
 import { TbReportMoney } from "react-icons/tb";
+import { IoIosCloseCircle } from "react-icons/io";
 
-function SideBar() {
+function SideBar({openSideBar, setOpenSideBar}) {
     const handleLogout = () => {
         if(typeof window !== 'undefined') {
             localStorage.clear()
@@ -20,12 +21,14 @@ function SideBar() {
         }
     }
     return(
-        <div className={styles.sideBar}>
+        <div className={openSideBar ? `${styles.sideBar} ${styles.active}` : `${styles.sideBar}`}>
+            
             <div className={styles.title}>
                 <h2>العنتري</h2>
                 <div className={styles.imageContainer}>
                     <Image src={logo} fill style={{objectFit: 'cove'}} alt="logoImage"/>
                 </div>
+                <button className={styles.closeBtn} onClick={() => setOpenSideBar(false)}><IoIosCloseCircle/></button>
             </div>
             <div className={styles.actions}>
                 <Link href={'/'} className={styles.actionLinks}>

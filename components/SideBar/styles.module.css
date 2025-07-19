@@ -50,3 +50,31 @@
     background-color: var(--main-color);
     color: white;
 }
+.closeBtn {
+    display: none;
+}
+
+@media(max-width: 767px) {
+    .sideBar {
+        position: fixed;
+        right: -200%;
+        background-color: white;
+        width: 50%;
+        z-index: 2000;
+        transition: .3s;
+    }
+    .sideBar.active {
+        right: 0;
+    }
+    .closeBtn {
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        background-color: transparent;
+        color: black;
+        border: none;
+        font-size: 25px;
+        margin-left: 10px;
+    }
+}

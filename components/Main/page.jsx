@@ -8,6 +8,7 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import { IoIosCloseCircle } from "react-icons/io";
 import { FaUser } from "react-icons/fa";
 import { FaPhone } from "react-icons/fa";
+import { FaBars } from "react-icons/fa6";
 import {   
   collection, query, where, onSnapshot, addDoc, updateDoc, doc, deleteDoc, getDocs 
 } from "firebase/firestore";
@@ -17,6 +18,7 @@ function Main() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [savePage, setSavePage] = useState(false)
+  const [openSideBar, setOpenSideBar] = useState(false)
   const [customPrices, setCustomPrices] = useState({});
   const [searchCode, setSearchCode] = useState("");
   const [filterType, setFilterType] = useState("all");
@@ -137,7 +139,7 @@ function Main() {
 
   return (
     <div className={styles.mainContainer}>
-      <SideBar />
+      <SideBar openSideBar={openSideBar} setOpenSideBar={setOpenSideBar}/>
       <div className={styles.boxContainer} style={{display: savePage ? 'block' : 'none'}}>
         <div className={styles.boxTitle}>
           <h2>تقفيل البيعة</h2>
@@ -158,7 +160,10 @@ function Main() {
 
       <div className={styles.middleSection}>
         <div className={styles.title}>
-          <h3>المبيعات</h3>
+          <div className={styles.rightSide}>
+            <button onClick={() => setOpenSideBar(true)}><FaBars/></button>
+            <h3>المبيعات</h3>
+          </div>
           <div className={styles.inputBox}>
             <div className="inputContainer">
               <label><IoMdSearch /></label>
@@ -210,30 +215,28 @@ function Main() {
             <p>{otherCount} منتج</p>
           </div>
         </div>
-
         <hr />
-
         {/* ✅ جدول عرض المنتجات */}
         <div className={styles.tableContainer}>
           <table>
                 <thead>
                     <tr>
-                        <th>كود المنتج</th>
-                        <th>اسم المنتج</th>
+                        <th className={styles.lastRow}>الكود</th>
+                        <th>السعر</th>
                         <th>السعر</th>
                         <th>السريال</th>
-                        <th>السعر النهائي</th>
-                        <th>تفاعل</th>
+                        <th className={styles.lastRow}>تحديد</th>
+                        <th className={styles.lastRow}>تفاعل</th>
                     </tr>
                 </thead>
                 <tbody>
                     {filteredProducts.map((product) => (
                         <tr key={product.id}>
-                        <td>{product.code}</td>
+                        <td className={styles.lastRow}>{product.code}</td>
                         <td>{product.name}</td>
                         <td>{product.sellPrice} EGP</td>
                         <td>{product.serial}</td>
-                        <td>
+                        <td  className={styles.lastRow}>
                           <input
                           type="number"
                           placeholder="سعر مخصص"
@@ -253,7 +256,7 @@ function Main() {
                 </tbody>
           </table>
         </div>
-    </div>
+       </div>
      {/* ✅ الفاتورة */}
       <div className={styles.resetContainer}>
         <div className={styles.reset}>
@@ -295,7 +298,6 @@ function Main() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
