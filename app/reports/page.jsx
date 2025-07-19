@@ -93,41 +93,41 @@ function Reports() {
                 </div>
 
                 {/* الكروت بتفاصيل المنتجات داخل الـ cart */}
-                <div className="moblieContainer">
-                                    {reports.map((report, reportIndex) =>
-                    report.cart?.map((item, index) => {
-                        const cardIndex = `${reportIndex}-${index}`;
-                        return (
-                            <div
-                                key={cardIndex}
-                                onClick={() =>
-                                    setOpenCard(openCard === cardIndex ? null : cardIndex)
-                                }
-                                className={openCard === cardIndex ? 'card open' : 'card'}
-                            >
-                                <div className="cardHead">
-                                    <h3>{item.name}</h3>
+                <div className="moblieCardContainer">
+                    {reports.map((report, reportIndex) =>
+                        report.cart?.map((item, index) => {
+                            const cardIndex = `${reportIndex}-${index}`;
+                            return (
+                                <div
+                                    key={cardIndex}
+                                    onClick={() =>
+                                        setOpenCard(openCard === cardIndex ? null : cardIndex)
+                                    }
+                                    className={openCard === cardIndex ? 'card open' : 'card'}
+                                >
+                                    <div className="cardHead">
+                                        <h3>{item.name}</h3>
+                                    </div>
+                                    <hr />
+                                    <div className="cardBody">
+                                        <strong>كود المنتج: {item.code || '-'}</strong>
+                                        <strong>سعر الشراء: {item.buyPrice || '-'} EGP</strong>
+                                        <strong>سعر البيع: {item.sellPrice || '-'} EGP</strong>
+                                        <strong>الكمية: {item.quantity || '-'}</strong>
+                                        <strong>البطارية: {item.battery || '-'}</strong>
+                                        <strong>المساحة: {item.storage || '-'}</strong>
+                                        <strong>اللون: {item.color || '-'}</strong>
+                                        <strong>السريال: {item.serial || '-'}</strong>
+                                        <strong>الضريبة: {item.tax || '-'}</strong>
+                                        <strong>الكرتونة: {item.box || '-'}</strong>
+                                        <strong>الحالة: {item.condition || '-'}</strong>
+                                        <strong>الشريحة: {item.sim || '-'}</strong>
+                                        <strong>التاجر: {item.owner || '-'}</strong>
+                                    </div>
                                 </div>
-                                <hr />
-                                <div className="cardBody">
-                                    <strong>كود المنتج: {item.code || '-'}</strong>
-                                    <strong>سعر الشراء: {item.buyPrice || '-'} EGP</strong>
-                                    <strong>سعر البيع: {item.sellPrice || '-'} EGP</strong>
-                                    <strong>الكمية: {item.quantity || '-'}</strong>
-                                    <strong>البطارية: {item.battery || '-'}</strong>
-                                    <strong>المساحة: {item.storage || '-'}</strong>
-                                    <strong>اللون: {item.color || '-'}</strong>
-                                    <strong>السريال: {item.serial || '-'}</strong>
-                                    <strong>الضريبة: {item.tax || '-'}</strong>
-                                    <strong>الكرتونة: {item.box || '-'}</strong>
-                                    <strong>الحالة: {item.condition || '-'}</strong>
-                                    <strong>الشريحة: {item.sim || '-'}</strong>
-                                    <strong>التاجر: {item.owner || '-'}</strong>
-                                </div>
-                            </div>
-                        );
-                    })
-                )}
+                            );
+                        })
+                    )}
                 </div>
             </div>
         </div>

@@ -129,7 +129,7 @@ function Debts() {
                             </tbody>
                         </table>
                     </div>
-                    <div className="mobilContainer">
+                    <div className="moblieCardContainer">
                         {customers.map((customer, index) => (
                             <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={customer.id}>
                                 <div className="cardHead">

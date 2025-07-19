@@ -454,7 +454,7 @@ function Phones() {
               </tbody>
             </table>
           </div>
-          <div className="mobileContainer">
+          <div className="moblieCardContainer">
             {filteredProducts.map((product, index) => (
               <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={product.id}>
                 <div className="cardHead">
