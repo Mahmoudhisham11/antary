@@ -2,8 +2,9 @@
 import SideBar from "@/components/SideBar/page";
 import styles from "./styles.module.css";
 import { useState, useEffect } from "react";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/app/firebase";
+import { FaTrashAlt } from "react-icons/fa";
 
 function Reports() {
     const [selectedDate, setSelectedDate] = useState("");
@@ -42,6 +43,10 @@ function Reports() {
         return () => unsubscribe();
     }, [selectedDate, shop]);
 
+    const handleDelete = async(id) => {
+        await deleteDoc(doc(db, 'reports', id))
+    }
+
     return (
         <div className={styles.reports}>
             <SideBar />
@@ -66,6 +71,7 @@ function Reports() {
                                 <th>الكمية</th>
                                 <th>اسم العميل</th>
                                 <th>رقم الهاتف</th>
+                                <th>حذف</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,13 +84,16 @@ function Reports() {
                                         <td>{item.quantity}</td>
                                         <td>{report.name}</td>
                                         <td>{report.phone}</td>
+                                        <td>
+                                            <button className={styles.delBtn} onClick={() => handleDelete(report.id)}><FaTrashAlt/></button>
+                                        </td>
                                     </tr>
                                 ))
                             )}
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colSpan={6} style={{ textAlign: "right", fontWeight: "bold" }}>
+                                <td colSpan={7} style={{ textAlign: "right", fontWeight: "bold" }}>
                                     الاجمالي: {totalAmount} EGP
                                 </td>
                             </tr>

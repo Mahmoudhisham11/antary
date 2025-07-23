@@ -8,7 +8,6 @@ import { CiSearch } from "react-icons/ci";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { GoNumber } from "react-icons/go";
 import { MdOutlinePersonOutline } from "react-icons/md";
-
 import {
   collection,
   addDoc,
@@ -28,6 +27,9 @@ function Products() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [openCard, setOpenCard] = useState('')
   const [searchCode, setSearchCode] = useState("");
+  const [totalBuy, setTotalBuy] = useState(0); // ✅ إجمالي الشراء
+  const [totalSell, setTotalSell] = useState(0); // ✅ إجمالي البيع
+
   const [form, setForm] = useState({
     name: "",
     buyPrice: "",
@@ -48,6 +50,16 @@ function Products() {
       }));
       setProducts(data);
 
+      // ✅ حساب الإجماليات
+      let totalBuyAmount = 0;
+      let totalSellAmount = 0;
+      data.forEach((product) => {
+        totalBuyAmount += (product.buyPrice || 0) * (product.quantity || 1);
+        totalSellAmount += (product.sellPrice || 0) * (product.quantity || 1);
+      });
+      setTotalBuy(totalBuyAmount);
+      setTotalSell(totalSellAmount);
+
       if (searchCode.trim()) {
         const filtered = data.filter((p) =>
           p.name?.toLowerCase().includes(searchCode.trim().toLowerCase())
@@ -63,12 +75,7 @@ function Products() {
 
   const getNextCode = async () => {
     const shop = localStorage.getItem("shop");
-
-    const q = query(
-      collection(db, "products"),
-      where("shop", "==", shop)
-    );
-
+    const q = query(collection(db, "products"), where("shop", "==", shop));
     const snapshot = await getDocs(q);
     if (snapshot.empty) return 1000;
 
@@ -115,7 +122,7 @@ function Products() {
     }
   };
 
-    const handlePrintLabel = (product) => {
+  const handlePrintLabel = (product) => {
     const printWindow = window.open('', '', 'width=300,height=200');
     const htmlContent = `
       <html>
@@ -151,7 +158,6 @@ function Products() {
     printWindow.document.close();
   };
 
-
   return (
     <div className={styles.products}>
       <SideBar />
@@ -180,6 +186,12 @@ function Products() {
               </datalist>
             </div>
           </div>
+
+          <div className={styles.totals}>
+            <p>اجمالي الشراء: {totalBuy} EGP</p>
+            <p>اجمالي البيع: {totalSell} EGP</p>
+          </div>
+
           <div className={styles.tableContainer}>
             <table>
               <thead>
@@ -220,6 +232,7 @@ function Products() {
               </tbody>
             </table>
           </div>
+
           <div className="moblieCardContainer">
             {filteredProducts.map((product, index) => (
               <div onClick={() => setOpenCard(openCard === index ? null : index)} className={openCard === index ? 'card open' : 'card'} key={product.id}>

@@ -30,6 +30,12 @@
 .btns button:hover {
     background-color: var(--hover-color);
 }
+.totals {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .phoneContainer {
     width: 100%;
     display: flex;
