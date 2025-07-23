@@ -100,8 +100,11 @@ function Main() {
   const handleSaveReport = async () => {
     const name = nameRef.current.value.trim();
     const phone = phoneRef.current.value.trim();
-    if (!name || !phone || cart.length === 0) return alert("ادخل اسم العميل ورقم الهاتف واضف منتجات أولاً");
 
+    if (!name || !phone || cart.length === 0)
+      return alert("ادخل اسم العميل ورقم الهاتف واضف منتجات أولاً");
+
+    // حفظ بيانات العميل
     await addDoc(collection(db, "users"), {
       name,
       phone,
@@ -109,6 +112,7 @@ function Main() {
       shop,
     });
 
+    // حفظ تفاصيل البيعة
     await addDoc(collection(db, "reports"), {
       name,
       phone,
@@ -118,24 +122,32 @@ function Main() {
       shop,
     });
 
+    // تحديث أو حذف المنتجات بعد البيع
     for (const item of cart) {
       const productDoc = products.find(p => p.name === item.name);
       if (!productDoc) continue;
 
-      if (productDoc.quantity && productDoc.quantity > item.quantity) {
-        await updateDoc(doc(db, "products", productDoc.id), {
-          quantity: productDoc.quantity - item.quantity,
-        });
+      if (productDoc.quantity !== undefined) {
+        if (productDoc.quantity > item.quantity) {
+          await updateDoc(doc(db, "products", productDoc.id), {
+            quantity: productDoc.quantity - item.quantity,
+          });
+        } else {
+          await deleteDoc(doc(db, "products", productDoc.id));
+        }
       } else {
+        // المنتج مفهوش quantity، نعتبره قطعة واحدة ونتخلص منه بعد البيع
         await deleteDoc(doc(db, "products", productDoc.id));
       }
     }
 
+    // حذف كل العناصر من السلة
     const cartDocs = await getDocs(query(collection(db, "cart"), where("shop", "==", shop)));
     cartDocs.forEach(async (c) => await deleteDoc(doc(db, "cart", c.id)));
 
     setSavePage(false);
-  }
+  };
+
 
   return (
     <div className={styles.mainContainer}>
