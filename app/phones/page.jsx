@@ -87,6 +87,7 @@ function Phones() {
         name: form.name,
         buyPrice: Number(form.buyPrice),
         sellPrice: Number(form.sellPrice),
+        quantity: Number(1),
         battery: form.battery,
         storage: form.storage,
         color: form.color,

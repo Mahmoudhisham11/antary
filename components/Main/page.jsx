@@ -46,26 +46,28 @@ function Main() {
     return () => unsubscribe();
   }, [shop]);
 
-  const handleAddToCart = async (product) => {
-    const customPrice = Number(customPrices[product.id]);
-    const finalPrice = !isNaN(customPrice) && customPrice > 0 ? customPrice : product.sellPrice;
+const handleAddToCart = async (product) => {
+  const customPrice = Number(customPrices[product.id]);
+  const finalPrice = !isNaN(customPrice) && customPrice > 0 ? customPrice : product.sellPrice;
 
-    await addDoc(collection(db, "cart"), {
-      name: product.name,
-      sellPrice: finalPrice,
-      serial: product.serial || 0,
-      quantity: 1,
-      total: finalPrice,
-      date: new Date(),
-      shop: shop,
-    });
+  await addDoc(collection(db, "cart"), {
+    name: product.name,
+    sellPrice: finalPrice,
+    serial: product.serial || 0,
+    code: product.code, // ✅ أضف الكود هنا
+    quantity: 1,
+    total: finalPrice,
+    date: new Date(),
+    shop: shop,
+  });
 
-    setCustomPrices(prev => {
-      const updated = { ...prev };
-      delete updated[product.id];
-      return updated;
-    });
-  };
+  setCustomPrices(prev => {
+    const updated = { ...prev };
+    delete updated[product.id];
+    return updated;
+  });
+};
+
 
   const handleQtyChange = async (cartItem, delta) => {
     const newQty = cartItem.quantity + delta;
@@ -97,56 +99,78 @@ function Main() {
   const phonesCount = products.filter(p => p.type === "phone").length;
   const otherCount = products.filter(p => p.type !== "phone").length;
 
-  const handleSaveReport = async () => {
-    const name = nameRef.current.value.trim();
-    const phone = phoneRef.current.value.trim();
+const handleSaveReport = async () => {
+  const clientName = nameRef.current.value;
+  const phone = phoneRef.current.value;
 
-    if (!name || !phone || cart.length === 0)
-      return alert("ادخل اسم العميل ورقم الهاتف واضف منتجات أولاً");
+  if (cart.length === 0 || clientName.trim() === "" || phone.trim() === "") {
+    alert("يرجى ملء جميع الحقول وإضافة منتجات إلى السلة");
+    return;
+  }
 
-    // حفظ بيانات العميل
-    await addDoc(collection(db, "users"), {
-      name,
-      phone,
-      date: new Date(),
-      shop,
-    });
-
-    // حفظ تفاصيل البيعة
-    await addDoc(collection(db, "reports"), {
-      name,
-      phone,
-      date: new Date(),
-      cart,
-      total: totalAmount,
-      shop,
-    });
-
-    // تحديث أو حذف المنتجات بعد البيع
+  try {
     for (const item of cart) {
-      const productDoc = products.find(p => p.name === item.name);
-      if (!productDoc) continue;
+      const q = query(
+        collection(db, "products"),
+        where("code", "==", item.code),
+        where("shop", "==", shop)
+      );
+      const snapshot = await getDocs(q);
 
-      if (productDoc.quantity !== undefined) {
-        if (productDoc.quantity > item.quantity) {
-          await updateDoc(doc(db, "products", productDoc.id), {
-            quantity: productDoc.quantity - item.quantity,
-          });
+      if (!snapshot.empty) {
+        const productDoc = snapshot.docs[0];
+        const productData = productDoc.data();
+        const productRef = productDoc.ref;
+
+        const availableQty = productData.quantity || 0;
+        const sellQty = item.quantity;
+
+        if (sellQty > availableQty) {
+          alert(`الكمية غير كافية للمنتج: ${item.name}`);
+          return;
+        } else if (sellQty === availableQty) {
+          await deleteDoc(productRef); // حذف المنتج لو الكمية خلصت
         } else {
-          await deleteDoc(doc(db, "products", productDoc.id));
+          await updateDoc(productRef, {
+            quantity: availableQty - sellQty, // خصم الكمية
+          });
         }
-      } else {
-        // المنتج مفهوش quantity، نعتبره قطعة واحدة ونتخلص منه بعد البيع
-        await deleteDoc(doc(db, "products", productDoc.id));
       }
     }
 
-    // حذف كل العناصر من السلة
-    const cartDocs = await getDocs(query(collection(db, "cart"), where("shop", "==", shop)));
-    cartDocs.forEach(async (c) => await deleteDoc(doc(db, "cart", c.id)));
+    // حساب إجمالي الفاتورة
+    const total = cart.reduce((sum, item) => sum + item.total, 0);
 
-    setSavePage(false);
-  };
+    // حفظ التقرير
+    await addDoc(collection(db, "reports"), {
+      cart,
+      clientName,
+      phone,
+      total,
+      date: new Date(),
+      shop,
+    });
+
+    // حذف كل عناصر السلة
+    const cartSnapshot = await getDocs(collection(db, "cart"));
+    for (const doc of cartSnapshot.docs) {
+      await deleteDoc(doc.ref);
+    }
+
+    alert("تم حفظ التقرير بنجاح");
+  } catch (error) {
+    console.error("حدث خطأ أثناء حفظ التقرير:", error);
+    alert("حدث خطأ أثناء حفظ التقرير");
+  }
+  setSavePage(false)
+};
+
+
+
+
+
+
+
 
 
   return (
