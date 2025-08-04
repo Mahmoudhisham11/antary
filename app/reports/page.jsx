@@ -2,7 +2,7 @@
 import SideBar from "@/components/SideBar/page";
 import styles from "./styles.module.css";
 import { useState, useEffect } from "react";
-import { collection, query, where, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, where, onSnapshot, deleteDoc, doc, getDoc, getDocs, updateDoc, addDoc } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import { FaTrashAlt } from "react-icons/fa";
 
@@ -43,9 +43,66 @@ function Reports() {
         return () => unsubscribe();
     }, [selectedDate, shop]);
 
-    const handleDelete = async(id) => {
-        await deleteDoc(doc(db, 'reports', id))
+const handleDelete = async (id) => {
+  try {
+    // 1. جلب التقرير من الـ reports
+    const reportRef = doc(db, 'reports', id);
+    const reportSnap = await getDoc(reportRef);
+
+    if (!reportSnap.exists()) {
+      alert("هذا التقرير غير موجود");
+      return;
     }
+
+    const reportData = reportSnap.data();
+    const cartItems = reportData.cart;
+    const shop = reportData.shop;
+
+    // 2. استرجاع المنتجات للـ products
+    for (const item of cartItems) {
+      const q = query(
+        collection(db, "products"),
+        where("code", "==", item.code),
+        where("shop", "==", shop)
+      );
+
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        // لو المنتج موجود بالفعل، زود الكمية
+        const productDoc = snapshot.docs[0];
+        const currentQty = productDoc.data().quantity || 0;
+
+        await updateDoc(productDoc.ref, {
+          quantity: currentQty + item.quantity,
+        });
+      } else {
+        // لو المنتج مش موجود، ضيفه جديد
+        await addDoc(collection(db, "products"), {
+        name: item.name ?? "بدون اسم",
+        code: item.code ?? 0,
+        serial: item.serial ?? 0,
+        sellPrice: item.sellPrice ?? item.price ?? 0,
+        type: item.type ?? "product",    
+        owner: item.owner,
+        quantity: 1,    
+        date: new Date(),
+        shop: item.shop ?? shop,
+        });
+
+
+      }
+    }
+
+    // 3. حذف التقرير بعد استرجاع المنتجات
+    await deleteDoc(reportRef);
+    alert("تم حذف التقرير واسترجاع المنتجات بنجاح");
+  } catch (error) {
+    console.error("خطأ أثناء الحذف:", error);
+    alert("حدث خطأ أثناء الحذف");
+  }
+};
+
 
     return (
         <div className={styles.reports}>

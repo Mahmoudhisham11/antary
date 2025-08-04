@@ -53,9 +53,12 @@ const handleAddToCart = async (product) => {
   await addDoc(collection(db, "cart"), {
     name: product.name,
     sellPrice: finalPrice,
+    productPrice: product.sellPrice,
     serial: product.serial || 0,
-    code: product.code, // ✅ أضف الكود هنا
+    code: product.code,
+    owner: product.owner, // ✅ أضف الكود هنا
     quantity: 1,
+    type: product.type,
     total: finalPrice,
     date: new Date(),
     shop: shop,
